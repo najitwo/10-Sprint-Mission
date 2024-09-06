@@ -1,42 +1,28 @@
-const validationMessage = {
-  requiredEmail: "이메일을 입력해주세요",
-  invalidEmail: "잘못된 이메일 형식입니다.",
-  requiredPassword: "비밀번호를 입력해주세요.",
-  weekPassword: "비밀번호를 8자 이상 입력해주세요.",
-  mismatchedPassword: "비밀번호가 일치하지 않습니다.",
-  requiredNickname: "닉네임을 입력해주세요.",
-};
-
-const isValidEmail = (email) => {
-  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return regex.test(email);
-};
+import { VALIDATION_MESSAGE, checkEmailValid } from "./utils/utils.js";
 
 const showMessage = (message, messageElement, inputElement) => {
   messageElement.textContent = message;
   messageElement.style.display = "inline-block";
   inputElement.parentNode.classList.add("validation-focus");
-  toggleButtonActive();
 };
 
 const hideMessage = (messageElement, inputElement) => {
   messageElement.style.display = "none";
   inputElement.parentNode.classList.remove("validation-focus");
-  toggleButtonActive();
 };
 
-const isFormComplete = () => {
-  const existValiation = document.querySelector(".validation-focus");
+const checkFormComplete = () => {
+  const existValidation = document.querySelector(".validation-focus");
   const fields = [...document.querySelectorAll("input")];
   const allCompleted = fields.every((field) => field.value.trim() !== "");
 
-  return allCompleted && !existValiation;
+  return allCompleted && !existValidation;
 };
 
 const toggleButtonActive = () => {
   const $submitButton = document.querySelector(".auth-form > button");
 
-  if (isFormComplete()) {
+  if (checkFormComplete()) {
     $submitButton.classList.add("active");
     $submitButton.disabled = false;
     return;
@@ -59,74 +45,121 @@ export const togglePasswordVisibility = (event) => {
   $passwordInput.type = "text";
 };
 
-export const validateEmail = (inputElement, messageElement) => {
-  const email = inputElement.value.trim();
-
-  if (email === "") {
-    showMessage(validationMessage.requiredEmail, messageElement, inputElement);
-    return;
+const checkEmailValidation = ({ value }) => {
+  if (!value.trim()) {
+    return {
+      isError: true,
+      message: VALIDATION_MESSAGE.REQUIRED_EMAIL,
+    };
   }
 
-  if (!isValidEmail(email)) {
-    showMessage(validationMessage.invalidEmail, messageElement, inputElement);
+  if (!checkEmailValid(value)) {
+    return {
+      isError: true,
+      message: VALIDATION_MESSAGE.INVALID_EMAIL,
+    };
+  }
+
+  return { isError: false };
+};
+
+export const validateEmail = (inputElement, messageElement) => {
+  const { isError, message } = checkEmailValidation(inputElement);
+
+  if (isError) {
+    showMessage(message, messageElement, inputElement);
+    toggleButtonActive();
     return;
   }
 
   hideMessage(messageElement, inputElement);
+  toggleButtonActive();
+};
+
+const checkPasswordValidation = ({ value }) => {
+  if (!value) {
+    return {
+      isError: true,
+      message: VALIDATION_MESSAGE.REQUIRED_PASSWORD,
+    };
+  }
+
+  if (value.length < 8) {
+    return {
+      isError: true,
+      message: VALIDATION_MESSAGE.WEEK_PASSWORD,
+    };
+  }
+
+  return { isError: false };
 };
 
 export const validatePassword = (inputElement, messageElement) => {
-  const password = inputElement.value;
+  const { isError, message } = checkPasswordValidation(inputElement);
 
-  if (password === "") {
-    showMessage(
-      validationMessage.requiredPassword,
-      messageElement,
-      inputElement
-    );
-    return;
-  }
-
-  if (password.length < 8) {
-    showMessage(validationMessage.weekPassword, messageElement, inputElement);
+  if (isError) {
+    showMessage(message, messageElement, inputElement);
+    toggleButtonActive();
     return;
   }
 
   hideMessage(messageElement, inputElement);
+  toggleButtonActive();
+};
+
+const checkNicknameValidation = ({ value }) => {
+  if (!value.trim()) {
+    return {
+      isError: true,
+      message: VALIDATION_MESSAGE.REQUIRED_NICKNAME,
+    };
+  }
+
+  return { isError: false };
 };
 
 export const validateNickname = (inputElement, messageElement) => {
-  const nickname = inputElement.value.trim();
+  const { isError, message } = checkNicknameValidation(inputElement);
 
-  if (nickname === "") {
-    showMessage(
-      validationMessage.requiredNickname,
-      messageElement,
-      inputElement
-    );
+  if (isError) {
+    showMessage(message, messageElement, inputElement);
+    toggleButtonActive();
     return;
   }
 
   hideMessage(messageElement, inputElement);
+  toggleButtonActive();
 };
 
-export const validatePasswordCheck = (
+const checkPasswordConfirmValidation = ({ value }, confirmPassword) => {
+  if (value !== confirmPassword) {
+    return {
+      isError: true,
+      message: VALIDATION_MESSAGE.MISMATCHED_PASSWORD,
+    };
+  }
+
+  return { isError: false };
+};
+
+export const validatePasswordConfirm = (
   inputElement,
   messageElement,
   confirmPassword
 ) => {
-  const passwordCheck = inputElement.value;
+  const { isError, message } = checkPasswordConfirmValidation(
+    inputElement,
+    confirmPassword
+  );
 
-  if (passwordCheck !== confirmPassword) {
-    showMessage(
-      validationMessage.mismatchedPassword,
-      messageElement,
-      inputElement
-    );
+  if (isError) {
+    showMessage(message, messageElement, inputElement);
+    toggleButtonActive();
     return;
   }
 
   hideMessage(messageElement, inputElement);
+  toggleButtonActive();
 };
 
 export const handleSubmitButton = (event, url) => {

@@ -2,7 +2,7 @@ import {
   validateEmail,
   validateNickname,
   validatePassword,
-  validatePasswordCheck,
+  validatePasswordConfirm,
   handleSubmitButton,
   togglePasswordVisibility,
 } from "./auth.js";
@@ -46,7 +46,7 @@ $nicknameInput.addEventListener("focusout", () =>
 
 $passwordInput.addEventListener("focusout", () => {
   validatePassword($passwordInput, $passwordValidationMessage);
-  validatePasswordCheck(
+  validatePasswordConfirm(
     $passwordCheckInput,
     $passwordCheckValidationMessage,
     $passwordInput.value
@@ -54,7 +54,7 @@ $passwordInput.addEventListener("focusout", () => {
 });
 
 $passwordCheckInput.addEventListener("focusout", () =>
-  validatePasswordCheck(
+  validatePasswordConfirm(
     $passwordCheckInput,
     $passwordCheckValidationMessage,
     $passwordInput.value
