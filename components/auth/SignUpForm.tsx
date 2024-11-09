@@ -30,8 +30,8 @@ const LoginForm = () => {
     setError,
     trigger,
   } = useForm<FormValues>({ mode: "onChange" });
-  const router = useRouter();
   const { signup } = useAuth();
+  const router = useRouter();
   const watchedPassword = watch("password");
 
   const onSubmit = async (data: FormValues) => {
